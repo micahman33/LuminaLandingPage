@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
-type ThemeMode = "auto" | "light" | "dark";
 type ThemeValue = "light" | "dark";
 
 const FEATURES = [
@@ -15,16 +14,9 @@ const FEATURES = [
   "Native installers for macOS and Windows make setup simple, so you can write first and configure less.",
 ];
 
-const MODE_ORDER: ThemeMode[] = ["auto", "light", "dark"];
-
 function getTimeTheme(): ThemeValue {
   const hour = new Date().getHours();
   return hour >= 19 || hour < 7 ? "dark" : "light";
-}
-
-function cycleThemeMode(mode: ThemeMode): ThemeMode {
-  const index = MODE_ORDER.indexOf(mode);
-  return MODE_ORDER[(index + 1) % MODE_ORDER.length];
 }
 
 function ToolbarIcon({ path, active = false }: { path: string; active?: boolean }) {
@@ -50,18 +42,6 @@ function ToolbarIcon({ path, active = false }: { path: string; active?: boolean 
       </svg>
     </button>
   );
-}
-
-function ThemeIcon({ mode }: { mode: ThemeMode }) {
-  if (mode === "light") {
-    return (
-      <path d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.4 6.4-1.4-1.4M7 7 5.6 5.6m12.8 0L17 7M7 17l-1.4 1.4M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8" />
-    );
-  }
-  if (mode === "dark") {
-    return <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />;
-  }
-  return <path d="M20 16V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8m16 0H4m16 0v2H4v-2" />;
 }
 
 function LuminaMock({ theme }: { theme: ThemeValue }) {
@@ -220,7 +200,6 @@ function LuminaMock({ theme }: { theme: ThemeValue }) {
 }
 
 export default function Home() {
-  const [mode, setMode] = useState<ThemeMode>("auto");
   const [timeTheme, setTimeTheme] = useState<ThemeValue>(getTimeTheme);
   const currentYear = useMemo(() => new Date().getFullYear(), []);
 
@@ -229,159 +208,176 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  const theme = useMemo<ThemeValue>(() => (mode === "auto" ? timeTheme : mode), [mode, timeTheme]);
-  const nextTheme = useMemo(() => cycleThemeMode(mode), [mode]);
+  const theme = timeTheme;
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-6 py-14 md:px-10 md:py-16">
-      <section className="space-y-16 md:space-y-20">
-        <div className="relative overflow-hidden rounded-[2rem] border px-6 pb-10 pt-6 md:px-10 md:pb-14 md:pt-8" style={{ borderColor: "var(--lumina-border)", background: "var(--lumina-chrome)" }}>
-          <div
-            className="pointer-events-none absolute -right-10 -top-10 hidden h-[300px] w-[360px] overflow-hidden rounded-bl-[7rem] rounded-tr-[2rem] md:block"
-            style={{ background: "linear-gradient(160deg, #5B6CFF 0%, #3B4BD8 100%)" }}
+    <main className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-6 py-8 md:px-10 md:py-10">
+      <header className="flex items-center justify-between py-3">
+        <div className="inline-flex items-center gap-2.5">
+          <Image src="/lumina-icon.svg" alt="Lumina icon" width={24} height={24} className="h-6 w-6 rounded-md" />
+          <span className="text-lg font-semibold" style={{ color: "var(--lumina-ink)" }}>
+            Lumina
+          </span>
+        </div>
+        <nav className="hidden items-center gap-8 text-sm md:flex" style={{ color: "var(--lumina-ink-soft)" }}>
+          <a href="#features" className="transition-opacity hover:opacity-70">
+            Features
+          </a>
+          <a href="https://github.com/micahman33/lumina/releases" className="transition-opacity hover:opacity-70">
+            Changelog
+          </a>
+          <a href="https://github.com/micahman33/lumina" className="transition-opacity hover:opacity-70">
+            GitHub
+          </a>
+          <a
+            href="#download"
+            className="rounded-lg px-4 py-2 font-semibold text-white transition-all hover:-translate-y-0.5 hover:opacity-90"
+            style={{ background: "linear-gradient(180deg, #5B6CFF 0%, #3B4BD8 100%)" }}
           >
-            <Image
-              src="/lumina-icon.svg"
-              alt="Lumina visual accent"
-              width={220}
-              height={220}
-              className="absolute -bottom-8 right-8 h-56 w-56 rotate-[10deg] opacity-90"
-            />
-          </div>
+            Download
+          </a>
+        </nav>
+      </header>
 
-          <div className="flex items-start justify-between gap-4">
-            <div className="pt-10 md:pt-20">
-            <div className="mb-5 inline-flex items-center gap-3 rounded-full border px-3 py-1.5 text-sm" style={{ borderColor: "var(--lumina-border)" }}>
-              <Image src="/lumina-icon.svg" alt="Lumina icon" className="h-5 w-5 rounded-sm" width={20} height={20} />
-              <span style={{ color: "var(--lumina-ink-soft)" }}>Lumina for macOS + Windows</span>
-            </div>
-
-            <h1 className="text-5xl font-bold leading-[0.95] tracking-[-0.02em] md:text-7xl" style={{ color: "var(--lumina-ink)" }}>
-              Write beautifully.
-              <br />
-              Stay in flow.
-            </h1>
-            <p className="mt-7 max-w-2xl text-xl leading-9" style={{ color: "var(--lumina-ink-soft)" }}>
-              Lumina is a lightweight WYSIWYG editor for Markdown and TXT files focused on simplicity,
-              performance, and ease of use.
-            </p>
-
-            <div className="mt-12 flex flex-wrap gap-3">
-              <a
-                href="#download"
-                className="rounded-lg px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                style={{ background: "linear-gradient(180deg, #5B6CFF 0%, #3B4BD8 100%)" }}
-              >
-                Download now
-              </a>
-              <a
-                href="https://github.com/micahman33/lumina/releases"
-                className="rounded-lg border px-5 py-3 text-sm"
-                style={{ borderColor: "var(--lumina-border)", color: "var(--lumina-ink-soft)" }}
-              >
-                View all releases
-              </a>
-            </div>
-            </div>
-
-            <button
-              onClick={() => setMode(nextTheme)}
-              title={`Theme: ${mode}. Click to switch to ${nextTheme}.`}
-              className="mt-2 flex h-10 w-10 items-center justify-center rounded-lg border transition-colors hover:bg-black/5 dark:hover:bg-white/5"
-              style={{ borderColor: "var(--lumina-border)", color: "var(--lumina-ink-soft)", background: "var(--lumina-chrome)" }}
-              aria-label="Toggle theme mode"
+      <section className="space-y-10 pt-4 md:space-y-12 md:pt-8">
+        <div className="text-center">
+          <h1 className="text-5xl font-bold leading-[0.95] tracking-[-0.03em] md:text-8xl" style={{ color: "var(--lumina-ink)" }}>
+            Write beautifully.
+            <br />
+            <span
+              style={{
+                background: "linear-gradient(90deg, #2E3EBD 0%, #3B4BD8 45%, #5B6CFF 100%)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+              }}
             >
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-                <ThemeIcon mode={mode} />
+              Stay in flow.
+            </span>
+          </h1>
+          <p className="mx-auto mt-8 max-w-3xl text-xl leading-9" style={{ color: "var(--lumina-ink-soft)" }}>
+            A lightweight visual editor for Markdown and TXT files built for simplicity and performance so you can focus on the writing itself.
+          </p>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+            <a
+              href="https://github.com/micahman33/lumina/releases/download/v1.1.0/Lumina-1.1.0-arm64.dmg"
+              className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:opacity-90"
+              style={{ background: "linear-gradient(180deg, #5B6CFF 0%, #3B4BD8 100%)" }}
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor">
+                <path d="M16.4 13.2c0-2 1.6-3 1.7-3.1-1-.8-2.5-1-3-1-1.3-.1-2.5.7-3.2.7-.7 0-1.7-.7-2.8-.7-1.4 0-2.8.8-3.5 2.1-1.5 2.6-.4 6.5 1 8.6.7 1 1.6 2.1 2.8 2.1 1.1 0 1.5-.7 2.9-.7 1.3 0 1.7.7 2.9.7 1.2 0 2-1.1 2.7-2.1.8-1.2 1.1-2.4 1.1-2.4s-2.6-1-2.6-3.2Zm-2.2-5.4c.6-.8 1-1.8.9-2.8-.9 0-2 .6-2.7 1.4-.6.7-1.1 1.8-1 2.8 1 0 2-.5 2.8-1.4Z" />
               </svg>
-            </button>
+              Download for macOS
+            </a>
+            <a
+              href="https://github.com/micahman33/lumina/releases/download/v1.1.0/Lumina.Setup.1.1.0.exe"
+              className="inline-flex items-center gap-2 rounded-xl border px-6 py-3 text-sm font-semibold transition-all hover:-translate-y-0.5 hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+              style={{ borderColor: "var(--lumina-border)", color: "var(--lumina-ink)" }}
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor">
+                <path d="M3 4.5 11 3v8H3v-6.5Zm9 6.5V2.9L21 1.5V11h-9Zm-9 2h8v8L3 19.6V13Zm9 0h9v9.5L12 21v-8Z" />
+              </svg>
+              Download for Windows
+            </a>
           </div>
         </div>
 
-        <div className="pt-4 md:pt-8">
-          <LuminaMock theme={theme} />
+        <div className="relative mt-16 pt-4 md:mt-24 md:pt-8">
+          <div
+            className="pointer-events-none absolute inset-x-[10%] -top-4 h-28 rounded-[999px] blur-3xl md:inset-x-[18%] md:h-36"
+            style={{ background: "linear-gradient(180deg, rgba(91,108,255,0.28) 0%, rgba(91,108,255,0.08) 100%)" }}
+          />
+          <div className="relative">
+            <LuminaMock theme={theme} />
+          </div>
         </div>
       </section>
 
-      <section className="rounded-2xl border p-8 md:p-10" style={{ borderColor: "var(--lumina-border)", background: "var(--lumina-chrome)" }}>
-        <h2 className="text-2xl font-semibold md:text-3xl" style={{ color: "var(--lumina-ink)" }}>
-          Why people choose Lumina
+      <section
+        id="features"
+        className="px-1 py-2 md:px-2"
+      >
+        <h2 className="mx-auto max-w-3xl text-center text-3xl font-semibold leading-tight tracking-[-0.02em] md:text-5xl" style={{ color: "var(--lumina-ink)" }}>
+          Designed to disappear, so the{" "}
+          <span
+            style={{
+              background: "linear-gradient(90deg, #2E3EBD 0%, #3B4BD8 45%, #5B6CFF 100%)",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
+            }}
+          >
+            writing
+          </span>{" "}
+          comes forward.
         </h2>
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          {FEATURES.map((feature) => (
-            <div
-              key={feature}
-              className="rounded-md border p-5"
-              style={{
-                borderColor: "var(--lumina-border)",
-                background: "var(--lumina-bg)",
-              }}
-            >
-              <p className="text-[15px] leading-7" style={{ color: "var(--lumina-ink-soft)" }}>
+        <div className="mt-10 grid gap-5 md:mt-14 md:grid-cols-2">
+          {FEATURES.map((feature, index) => (
+            <article key={feature} className="border-t pt-6" style={{ borderColor: "var(--lumina-border)" }}>
+              <p className="text-xs" style={{ color: "var(--lumina-ink-faint)" }}>
+                {String(index + 1).padStart(2, "0")}
+              </p>
+              <p className="mt-2 text-2xl font-semibold tracking-[-0.02em]" style={{ color: "var(--lumina-ink)" }}>
+                {index === 0 && "Markdown, invisibly"}
+                {index === 1 && "Plain & portable"}
+                {index === 2 && "Calm, by design"}
+                {index === 3 && "Lightweight & fast"}
+                {index === 4 && "Light & dark"}
+                {index === 5 && "macOS & Windows"}
+              </p>
+              <p className="mt-2 text-lg leading-8" style={{ color: "var(--lumina-ink-soft)" }}>
                 {feature}
               </p>
-            </div>
+            </article>
           ))}
         </div>
       </section>
 
       <section
         id="download"
-        className="rounded-2xl border p-8 md:p-10"
-        style={{ borderColor: "var(--lumina-border)", background: "var(--lumina-chrome)" }}
+        className="relative overflow-hidden rounded-3xl border px-8 py-10 md:px-12 md:py-12"
+        style={{
+          borderColor: "var(--lumina-border)",
+          background: "linear-gradient(135deg, #11131b 0%, #14182a 45%, #1d2f73 100%)",
+        }}
       >
-        <h2 className="text-2xl font-semibold md:text-3xl" style={{ color: "var(--lumina-ink)" }}>
-          Choose your download
-        </h2>
-        <p className="mt-3 text-sm" style={{ color: "var(--lumina-ink-faint)" }}>
-          Latest stable release binaries are hosted on GitHub Releases.
-        </p>
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          <a
-            href="https://github.com/micahman33/lumina/releases/download/v1.1.0/Lumina-1.1.0-arm64.dmg"
-            className="flex items-center justify-between rounded-xl px-5 py-4 text-white transition-opacity hover:opacity-90"
-            style={{ background: "linear-gradient(180deg, #5B6CFF 0%, #3B4BD8 100%)" }}
-          >
-            <span className="flex items-center gap-3 font-semibold">
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
-                <path d="M16.4 13.2c0-2 1.6-3 1.7-3.1-1-.8-2.5-1-3-1-1.3-.1-2.5.7-3.2.7-.7 0-1.7-.7-2.8-.7-1.4 0-2.8.8-3.5 2.1-1.5 2.6-.4 6.5 1 8.6.7 1 1.6 2.1 2.8 2.1 1.1 0 1.5-.7 2.9-.7 1.3 0 1.7.7 2.9.7 1.2 0 2-1.1 2.7-2.1.8-1.2 1.1-2.4 1.1-2.4s-2.6-1-2.6-3.2Zm-2.2-5.4c.6-.8 1-1.8.9-2.8-.9 0-2 .6-2.7 1.4-.6.7-1.1 1.8-1 2.8 1 0 2-.5 2.8-1.4Z" />
-              </svg>
-              macOS (Apple Silicon)
-            </span>
-            <span className="text-sm" style={{ color: "var(--lumina-ink-faint)" }}>
-              .dmg
-            </span>
-          </a>
-          <a
-            href="https://github.com/micahman33/lumina/releases/download/v1.1.0/Lumina.Setup.1.1.0.exe"
-            className="flex items-center justify-between rounded-xl px-5 py-4 text-white transition-opacity hover:opacity-90"
-            style={{ background: "linear-gradient(180deg, #5B6CFF 0%, #3B4BD8 100%)" }}
-          >
-            <span className="flex items-center gap-3 font-semibold">
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
-                <path d="M3 4.5 11 3v8H3v-6.5Zm9 6.5V2.9L21 1.5V11h-9Zm-9 2h8v8L3 19.6V13Zm9 0h9v9.5L12 21v-8Z" />
-              </svg>
-              Windows (x64)
-            </span>
-            <span className="text-sm" style={{ color: "var(--lumina-ink-faint)" }}>
-              .exe
-            </span>
-          </a>
+        <div className="pointer-events-none absolute inset-0 opacity-40" style={{ background: "radial-gradient(circle at 55% -10%, rgba(91,108,255,0.9) 0%, rgba(91,108,255,0.12) 40%, transparent 70%)" }} />
+        <div className="relative flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
+          <div>
+            <h3 className="text-4xl font-bold tracking-[-0.03em] text-white md:text-5xl">Ready to write?</h3>
+            <p className="mt-3 text-lg text-white/75">Free, open source, and built to disappear. You&apos;ll be writing in 30 seconds.</p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <a
+              href="https://github.com/micahman33/lumina/releases/download/v1.1.0/Lumina-1.1.0-arm64.dmg"
+              className="rounded-xl bg-white px-6 py-3 text-sm font-semibold text-black transition-all hover:-translate-y-0.5 hover:bg-white/90"
+            >
+              macOS
+            </a>
+            <a
+              href="https://github.com/micahman33/lumina/releases/download/v1.1.0/Lumina.Setup.1.1.0.exe"
+              className="rounded-xl border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-white/20"
+            >
+              Windows
+            </a>
+          </div>
         </div>
       </section>
 
-      <footer className="space-y-2 border-t pt-6 text-sm" style={{ borderColor: "var(--lumina-border)", color: "var(--lumina-ink-faint)" }}>
+      <footer
+        className="flex flex-col items-start justify-between gap-4 border-t py-8 text-sm md:flex-row md:items-center"
+        style={{ borderColor: "var(--lumina-border)", color: "var(--lumina-ink-faint)" }}
+      >
         <p>Lumina is built for distraction-free writing and modern Markdown workflows.</p>
         <p>
           © {currentYear}{" "}
-          <a href="https://micahdanielsmith.com" className="underline-offset-2 hover:underline" style={{ color: "var(--lumina-ink-soft)" }}>
+          <a href="https://micahdanielsmith.com" className="underline-offset-2 transition-opacity hover:underline hover:opacity-80" style={{ color: "var(--lumina-ink-soft)" }}>
             MicahDanielSmith
           </a>
-          . All rights reserved.
         </p>
       </footer>
     </main>

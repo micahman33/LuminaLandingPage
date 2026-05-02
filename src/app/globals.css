@@ -15,7 +15,7 @@
 }
 
 body {
-  background: radial-gradient(circle at top, #f4f2ee 0%, #fafaf7 50%, #ffffff 100%);
+  background: #fafaf7;
   color: var(--lumina-ink);
   font-family:
     var(--font-inter-tight),
@@ -38,7 +38,7 @@ html[data-theme="dark"] {
 }
 
 html[data-theme="dark"] body {
-  background: radial-gradient(circle at top, #22222a 0%, #17171c 55%, #101014 100%);
+  background: #17171c;
 }
 
 @keyframes lumina-caret {
