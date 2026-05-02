@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Lumina — UI Redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #ECECEF; }
+  body {
+    font-family: "Inter Tight", -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #1F1F23;
+    -webkit-font-smoothing: antialiased;
+    padding: 56px 0 96px;
+  }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 32px; }
+  .label {
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-size: 11px; color: #6B6B70; letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  h1 {
+    font-size: 48px; font-weight: 600; letter-spacing: -1.4px;
+    margin: 12px 0 16px; line-height: 1.04;
+  }
+  .lead { font-size: 17px; color: #6B6B70; line-height: 1.55; max-width: 720px; margin: 0; }
+
+  .card {
+    background: #fff; border-radius: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    padding: 40px; margin-top: 28px;
+  }
+  h2 {
+    font-size: 24px; font-weight: 600; letter-spacing: -0.4px;
+    margin: 0 0 6px;
+  }
+  h2 + .desc { color: #6B6B70; font-size: 14px; margin-bottom: 28px; }
+
+  .stack { display: flex; flex-direction: column; gap: 28px; }
+
+  .frame-label {
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-size: 11px; color: #8B8B92; letter-spacing: 0.5px;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+
+  .changes {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 14px 28px;
+  }
+  .change { display: flex; gap: 12px; }
+  .change .num {
+    flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+    background: #EEF1FF; color: #3B4BD8;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+  }
+  .change h3 { margin: 2px 0 4px; font-size: 14px; font-weight: 600; }
+  .change p { margin: 0; font-size: 13px; color: #6B6B70; line-height: 1.45; }
+
+  .accents { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .acc {
+    border: 1px solid #E5E5EA; border-radius: 10px; padding: 14px 16px;
+  }
+  .acc h3 { margin: 0 0 4px; font-size: 13px; font-weight: 600; }
+  .acc p { margin: 0; font-size: 12px; color: #6B6B70; line-height: 1.4; }
+  .swatch {
+    display: inline-block; width: 12px; height: 12px; border-radius: 3px;
+    background: linear-gradient(180deg, #5B6CFF, #3B4BD8);
+    margin-right: 6px; vertical-align: -2px;
+  }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<script type="text/babel" src="lumina-ui.jsx"></script>
+
+<div class="wrap">
+  <div class="label">UI · LUMINA</div>
+  <h1>A calmer, lighter editor.</h1>
+  <p class="lead">
+    Same bones as your current build — sidebar, toolbar, editor — just with everything that wasn't earning its place removed. All-sans (Inter Tight). Indigo used sparingly, and only where it helps you locate something. Below: dark mode, light mode, and the rationale for each move.
+  </p>
+
+  <!-- Dark -->
+  <div class="card">
+    <div class="frame-label">DARK MODE</div>
+    <div id="dark"></div>
+  </div>
+
+  <!-- Light -->
+  <div class="card">
+    <div class="frame-label">LIGHT MODE</div>
+    <div id="light"></div>
+  </div>
+
+  <!-- Rationale -->
+  <div class="card">
+    <h2>What changed, and why</h2>
+    <div class="desc">In service of "lightweight and out of the way."</div>
+    <div class="changes">
+      <div class="change">
+        <div class="num">1</div>
+        <div>
+          <h3>Toolbar: full action set, with a Format dropdown</h3>
+          <p>Six clusters separated by hairline dividers: <em>history · format · inline · lists · blocks · insert</em>. H1/H2/H3 collapse into a single <strong>Format</strong> dropdown that also exposes <em>Paragraph</em> — so the editor can tell you what kind of block you're in, and switch it. Every icon has a tooltip on hover (with its keyboard shortcut), so nothing is mystery glyphs.</p>
+        </div>
+      </div>
+      <div class="change">
+        <div class="num">2</div>
+        <div>
+          <h3>Sidebar lost the path noise</h3>
+          <p>Just filename + relative time ("2 hours ago"). Full path appears on hover. The active file gets a 3px indigo bar and a soft tint — locatable at a glance, not loud.</p>
+        </div>
+      </div>
+      <div class="change">
+        <div class="num">3</div>
+        <div>
+          <h3>Search promoted to the top of the sidebar</h3>
+          <p>⌘K. Files-first; folder tree (when there are many) can come later. The folder context lives at the bottom — present, not prominent.</p>
+        </div>
+      </div>
+      <div class="change">
+        <div class="num">4</div>
+        <div>
+          <h3>Editor canvas given real margins</h3>
+          <p>640px max-width content column with 56px side padding. Reading length matches print. The page itself gets to feel like a page.</p>
+        </div>
+      </div>
+      <div class="change">
+        <div class="num">5</div>
+        <div>
+          <h3>Title bar shows what's open + the app</h3>
+          <p>The app icon, the filename, then "· Lumina" in muted color. No competing label up top — it doubles as identity.</p>
+        </div>
+      </div>
+      <div class="change">
+        <div class="num">6</div>
+        <div>
+          <h3>Status bar is one line of useful info</h3>
+          <p>Format · Encoding · Cursor position, with a "Saved" pill on the right. Calm, scannable, gone if you're not looking.</p>
+        </div>
+      </div>
+      <div class="change">
+        <div class="num">7</div>
+        <div>
+          <h3>Light mode is warm, not stark</h3>
+          <p>Page on <code style="font-family:ui-monospace;font-size:12px">#FAFAF7</code> with sidebar on <code style="font-family:ui-monospace;font-size:12px">#F4F2EE</code>. Soft, paper-like. Easier on the eyes than pure white-on-white.</p>
+        </div>
+      </div>
+      <div class="change">
+        <div class="num">8</div>
+        <div>
+          <h3>Inter Tight throughout</h3>
+          <p>One typeface, three weights (400/500/700). Display feel for headings, clean body, monospaced for code/metadata. Removes a layer of decision-making and looks unified.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accent usage -->
+  <div class="card">
+    <h2><span class="swatch"></span>Where the indigo shows up</h2>
+    <div class="desc">Used as a "you are here" signal — not decoration. If you removed it, the design would still work; it's just helpful.</div>
+    <div class="accents">
+      <div class="acc"><h3>Active file in sidebar</h3><p>3px bar + 10–16% tint</p></div>
+      <div class="acc"><h3>Cursor / caret</h3><p>The blink itself</p></div>
+      <div class="acc"><h3>Inline link emphasis</h3><p>Bolded indigo text in body</p></div>
+      <div class="acc"><h3>Blockquote rule</h3><p>2px left border</p></div>
+      <div class="acc"><h3>Active toolbar state</h3><p>Icon glows indigo when applied</p></div>
+      <div class="acc"><h3>Selection &amp; focus</h3><p>15% indigo highlight</p></div>
+    </div>
+  </div>
+
+</div>
+
+<script type="text/babel" data-presets="react">
+  const dark = ReactDOM.createRoot(document.getElementById("dark"));
+  const light = ReactDOM.createRoot(document.getElementById("light"));
+  dark.render(<LuminaApp theme="dark" width={1100} height={660} />);
+  light.render(<LuminaApp theme="light" width={1100} height={660} />);
+</script>
+
+</body>
+</html>

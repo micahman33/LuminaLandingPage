@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+:root {
+  --lumina-indigo: #3b4bd8;
+  --lumina-indigo-soft: #5b6cff;
+  --lumina-bg: #fafaf7;
+  --lumina-chrome: #ffffff;
+  --lumina-sidebar: #f4f2ee;
+  --lumina-titlebar: #f0eee9;
+  --lumina-border: #e8e6e0;
+  --lumina-ink: #1f1f23;
+  --lumina-ink-soft: #6b6b70;
+  --lumina-ink-faint: #a0a09a;
+  --lumina-active-tint: rgba(91, 108, 255, 0.1);
+}
+
+body {
+  background: radial-gradient(circle at top, #f4f2ee 0%, #fafaf7 50%, #ffffff 100%);
+  color: var(--lumina-ink);
+  font-family:
+    var(--font-inter-tight),
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+html[data-theme="dark"] {
+  --lumina-bg: #1a1a1f;
+  --lumina-chrome: #1f1f25;
+  --lumina-sidebar: #16161a;
+  --lumina-titlebar: #15151a;
+  --lumina-border: #2a2a30;
+  --lumina-ink: #ececef;
+  --lumina-ink-soft: #a8a8b0;
+  --lumina-ink-faint: #6b6b70;
+  --lumina-active-tint: rgba(91, 108, 255, 0.16);
+}
+
+html[data-theme="dark"] body {
+  background: radial-gradient(circle at top, #22222a 0%, #17171c 55%, #101014 100%);
+}
+
+@keyframes lumina-caret {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
