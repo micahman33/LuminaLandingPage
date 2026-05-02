@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   title: "Lumina | Lightweight WYSIWYG Markdown Editor",
   description:
     "Lumina is an elegant, high-performance WYSIWYG editor for Markdown and TXT files on macOS and Windows.",
+  icons: {
+    icon: [{ url: "/lumina-icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/apple-icon.png", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({
