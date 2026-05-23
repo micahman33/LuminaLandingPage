@@ -98,6 +98,100 @@ function wordCount(text: string): number {
   return text.trim() ? text.trim().split(/\s+/).length : 0;
 }
 
+// ── Markdown renderer ────────────────────────────────────────────────────────
+
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function renderInline(text: string): string {
+  return escapeHtml(text)
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*\n]+)\*/g, "<em>$1</em>")
+    .replace(
+      /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
+      '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>',
+    )
+    .replace(
+      /\[([^\]]+)\]\([^)]+\)/g,
+      '<span style="color:var(--lumina-indigo-soft);text-decoration:underline">$1</span>',
+    );
+}
+
+function renderMarkdown(md: string): string {
+  if (!md.trim()) return "";
+  const lines = md.split("\n");
+  const parts: string[] = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+    if (!line.trim()) { i++; continue; }
+
+    if (line.startsWith("# ")) {
+      parts.push(`<h1>${renderInline(line.slice(2))}</h1>`);
+      i++; continue;
+    }
+    if (line.startsWith("## ")) {
+      parts.push(`<h2>${renderInline(line.slice(3))}</h2>`);
+      i++; continue;
+    }
+    if (line.startsWith("### ")) {
+      parts.push(`<h3>${renderInline(line.slice(4))}</h3>`);
+      i++; continue;
+    }
+    if (/^---+$/.test(line.trim())) {
+      parts.push("<hr>");
+      i++; continue;
+    }
+    if (line.startsWith("> ")) {
+      parts.push(`<blockquote>${renderInline(line.slice(2))}</blockquote>`);
+      i++; continue;
+    }
+    // Task list (before regular list)
+    if (/^- \[[ x]\] /.test(line)) {
+      const items: string[] = [];
+      while (i < lines.length && /^- \[[ x]\] /.test(lines[i])) {
+        const checked = lines[i][3] === "x";
+        items.push(
+          `<li class="task-item"><span class="task-check">${checked ? "☑" : "☐"}</span> ${renderInline(lines[i].slice(6))}</li>`,
+        );
+        i++;
+      }
+      parts.push(`<ul class="task-list">${items.join("")}</ul>`);
+      continue;
+    }
+    // Unordered list
+    if (/^[-*] /.test(line)) {
+      const items: string[] = [];
+      while (i < lines.length && /^[-*] /.test(lines[i]) && !/^- \[[ x]\]/.test(lines[i])) {
+        items.push(`<li>${renderInline(lines[i].slice(2))}</li>`);
+        i++;
+      }
+      parts.push(`<ul>${items.join("")}</ul>`);
+      continue;
+    }
+    // Ordered list
+    if (/^\d+\. /.test(line)) {
+      const items: string[] = [];
+      while (i < lines.length && /^\d+\. /.test(lines[i])) {
+        items.push(`<li>${renderInline(lines[i].replace(/^\d+\. /, ""))}</li>`);
+        i++;
+      }
+      parts.push(`<ol>${items.join("")}</ol>`);
+      continue;
+    }
+    parts.push(`<p>${renderInline(line)}</p>`);
+    i++;
+  }
+  return parts.join("\n");
+}
+
 // ── Toolbar button ───────────────────────────────────────────────────────────
 
 function ToolbarIcon({
@@ -148,6 +242,7 @@ function LuminaMock({ theme }: { theme: ThemeValue }) {
   const [activeId, setActiveId] = useState("readme");
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
+  const [editMode, setEditMode] = useState(false);
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const renameInputRef = useRef<HTMLInputElement>(null);
@@ -165,11 +260,17 @@ function LuminaMock({ theme }: { theme: ThemeValue }) {
     [activeId],
   );
 
+  const enterEditMode = useCallback(() => {
+    setEditMode(true);
+    setCursorPos({ line: 1, col: 1 });
+    setTimeout(() => textareaRef.current?.focus(), 0);
+  }, []);
+
   const switchFile = useCallback((id: string) => {
     setActiveId(id);
     setRenamingId(null);
+    setEditMode(false);
     setCursorPos({ line: 1, col: 1 });
-    setTimeout(() => textareaRef.current?.focus(), 50);
   }, []);
 
   const addFile = useCallback(() => {
@@ -228,6 +329,7 @@ function LuminaMock({ theme }: { theme: ThemeValue }) {
   // Wrap selection in inline markers (bold, italic, code)
   const applyInline = useCallback(
     (prefix: string, suffix?: string) => {
+      if (!editMode) { enterEditMode(); return; }
       const ta = textareaRef.current;
       if (!ta) return;
       const suf = suffix ?? prefix;
@@ -241,12 +343,13 @@ function LuminaMock({ theme }: { theme: ThemeValue }) {
         ta.setSelectionRange(s + prefix.length, e + prefix.length);
       });
     },
-    [updateContent],
+    [editMode, enterEditMode, updateContent],
   );
 
   // Prepend a prefix to the current line (heading, list item, blockquote)
   const applyLinePrefix = useCallback(
     (prefix: string) => {
+      if (!editMode) { enterEditMode(); return; }
       const ta = textareaRef.current;
       if (!ta) return;
       const { selectionStart: s, value } = ta;
@@ -259,11 +362,12 @@ function LuminaMock({ theme }: { theme: ThemeValue }) {
         ta.setSelectionRange(s + prefix.length, s + prefix.length);
       });
     },
-    [updateContent],
+    [editMode, enterEditMode, updateContent],
   );
 
   // Link: wraps selection as [text](url) or inserts template
   const applyLink = useCallback(() => {
+    if (!editMode) { enterEditMode(); return; }
     const ta = textareaRef.current;
     if (!ta) return;
     const { selectionStart: s, selectionEnd: e, value } = ta;
@@ -286,7 +390,7 @@ function LuminaMock({ theme }: { theme: ThemeValue }) {
         ta.setSelectionRange(s + 1, s + 10);
       });
     }
-  }, [updateContent]);
+  }, [editMode, enterEditMode, updateContent]);
 
   const words = wordCount(activeFile.content);
   const readingMins = Math.max(1, Math.ceil(words / 250));
@@ -559,28 +663,49 @@ function LuminaMock({ theme }: { theme: ThemeValue }) {
           </div>
 
           {/* Editor content area */}
-          <div className="relative flex-1">
-            <textarea
-              ref={textareaRef}
-              value={activeFile.content}
-              onChange={(e) => updateContent(e.target.value)}
-              onSelect={updateCursor}
-              onKeyUp={updateCursor}
-              onClick={updateCursor}
-              spellCheck={false}
-              placeholder="Start writing…"
-              className="absolute inset-0 h-full w-full resize-none border-none outline-none"
-              style={{
-                background: "var(--lumina-bg)",
-                color: "var(--lumina-ink)",
-                padding: "40px 56px",
-                fontSize: 15,
-                lineHeight: 1.75,
-                fontFamily:
-                  "var(--font-inter-tight), -apple-system, BlinkMacSystemFont, sans-serif",
-                caretColor: "var(--lumina-indigo-soft)",
-              }}
-            />
+          <div className="relative flex-1 overflow-hidden">
+            {/* Preview mode — rendered markdown, click to edit */}
+            {!editMode && (
+              <div
+                className="lumina-preview absolute inset-0 overflow-y-auto"
+                style={{ padding: "40px 56px", cursor: "text" }}
+                onClick={enterEditMode}
+                dangerouslySetInnerHTML={{
+                  __html:
+                    renderMarkdown(activeFile.content) ||
+                    `<p style="color:var(--lumina-ink-faint)">Start writing…</p>`,
+                }}
+              />
+            )}
+
+            {/* Edit mode — raw markdown textarea */}
+            {editMode && (
+              <textarea
+                ref={textareaRef}
+                value={activeFile.content}
+                onChange={(e) => updateContent(e.target.value)}
+                onSelect={updateCursor}
+                onKeyUp={updateCursor}
+                onClick={updateCursor}
+                onBlur={() => setEditMode(false)}
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") setEditMode(false);
+                }}
+                spellCheck={false}
+                placeholder="Start writing…"
+                className="absolute inset-0 h-full w-full resize-none border-none outline-none"
+                style={{
+                  background: "var(--lumina-bg)",
+                  color: "var(--lumina-ink)",
+                  padding: "40px 56px",
+                  fontSize: 15,
+                  lineHeight: 1.75,
+                  fontFamily:
+                    "var(--font-inter-tight), -apple-system, BlinkMacSystemFont, sans-serif",
+                  caretColor: "var(--lumina-indigo-soft)",
+                }}
+              />
+            )}
           </div>
 
           {/* Status bar */}
