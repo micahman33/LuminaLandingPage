@@ -8,13 +8,40 @@ const interTight = Inter_Tight({
   weight: ["400", "500", "600", "700"],
 });
 
+const siteUrl = "https://luminaeditor.com";
+const title = "Lumina | Lightweight Visual Markdown Editor";
+const description =
+  "Lumina is an elegant, high-performance Visual editor for Markdown and TXT files on macOS and Windows.";
+
 export const metadata: Metadata = {
-  title: "Lumina | Lightweight WYSIWYG Markdown Editor",
-  description:
-    "Lumina is an elegant, high-performance WYSIWYG editor for Markdown and TXT files on macOS and Windows.",
+  metadataBase: new URL(siteUrl),
+  title,
+  description,
   icons: {
     icon: [{ url: "/lumina-icon.svg", type: "image/svg+xml" }],
     apple: [{ url: "/apple-icon.png", type: "image/png" }],
+  },
+  openGraph: {
+    title,
+    description,
+    url: siteUrl,
+    siteName: "Lumina",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Lumina — Lightweight Visual Markdown Editor",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: ["/og-image.png"],
   },
 };
 
