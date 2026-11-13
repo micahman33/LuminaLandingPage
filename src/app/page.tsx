@@ -3,11 +3,11 @@ import { LandingPage } from "./components/LandingPage";
 // Re-render this page at most once per hour so download links stay current
 export const revalidate = 3600;
 
-// Used if the GitHub API call fails; update if v1.1.0 is ever removed from releases
+// Used if the GitHub API call fails; update if v1.7.0 is ever removed from releases
 const FALLBACK_MAC_URL =
-  "https://github.com/micahman33/lumina/releases/download/v1.1.0/Lumina-1.1.0-arm64.dmg";
+  "https://github.com/micahman33/lumina/releases/download/v1.7.0/Lumina-1.7.0-arm64.dmg";
 const FALLBACK_WIN_URL =
-  "https://github.com/micahman33/lumina/releases/download/v1.1.0/Lumina.Setup.1.1.0.exe";
+  "https://github.com/micahman33/lumina/releases/download/v1.7.0/Lumina.Setup.1.7.0.exe";
 
 type GithubAsset = {
   name: string;

@@ -11,7 +11,7 @@ const interTight = Inter_Tight({
 const siteUrl = "https://luminaeditor.com";
 const title = "Lumina | Lightweight Visual Markdown Editor";
 const description =
-  "Lumina is an elegant, high-performance Visual editor for Markdown and TXT files on macOS and Windows.";
+  "Lumina is an elegant, lightweight visual editor for Markdown and text on macOS and Windows. It also opens JSON and XML pretty-printed with error checking, and CSV as an editable table.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

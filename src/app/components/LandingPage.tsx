@@ -6,12 +6,64 @@ import { useEffect, useMemo, useState } from "react";
 type ThemeValue = "light" | "dark";
 
 const FEATURES = [
-  "Editing Markdown should not feel like coding. Lumina keeps the syntax out of your way so you can focus on ideas.",
-  "Your files stay plain and portable while the editor feels modern, clear, and consistent every time you open a document.",
-  "A calm interface with thoughtful typography makes long writing and revision sessions easier on your eyes and attention.",
-  "Fast startup and lightweight performance keep you in flow, even when you are jumping between multiple notes and docs.",
-  "It follows your system appearance by default, with explicit light and dark control whenever you want to override it.",
-  "Native installers for macOS and Windows make setup simple, so you can write first and configure less.",
+  {
+    title: "Markdown, invisibly",
+    body: "Editing Markdown should not feel like coding. Lumina keeps the syntax out of your way so you can focus on ideas.",
+  },
+  {
+    title: "Plain & portable",
+    body: "Your files stay plain and portable while the editor feels modern, clear, and consistent every time you open a document.",
+  },
+  {
+    title: "JSON & XML, made readable",
+    body: "Open a config or data file and it is pretty-printed with syntax colours. Stray commas and unclosed tags are underlined right where they are.",
+  },
+  {
+    title: "CSV as a table",
+    body: "Spreadsheet exports open as a clean, editable table. Change cells, add rows, sort a column. Rows you don't touch are saved exactly as they were.",
+  },
+  {
+    title: "Logs & everything else",
+    body: "Logs, YAML, source code, files with no extension: if it is text, Lumina opens it in a tidy code view instead of turning you away.",
+  },
+  {
+    title: "Careful with your files",
+    body: "Opening a file never changes it. Encodings and line endings are preserved, and Lumina won't overwrite a file another program has changed.",
+  },
+  {
+    title: "Calm, light & dark",
+    body: "A quiet interface with thoughtful typography, following your system appearance with light and dark control whenever you want it.",
+  },
+  {
+    title: "Fast, on macOS & Windows",
+    body: "Quick to start and light on resources, with native installers for both platforms, so you can write first and configure less.",
+  },
+];
+
+const FIRST_LAUNCH = [
+  {
+    platform: "macOS",
+    steps: [
+      "Open the .dmg and drag Lumina to Applications.",
+      "Open Lumina. macOS blocks it the first time. Click Done.",
+      "Go to System Settings → Privacy & Security, scroll to Security, and click Open Anyway next to “Lumina was blocked”.",
+      "Confirm with your password or Touch ID. Lumina opens normally from then on.",
+    ],
+    note: "On macOS 14 or earlier you can right-click Lumina and choose Open instead.",
+    command: "xattr -dr com.apple.quarantine /Applications/Lumina.app",
+    commandLabel: "If macOS says Lumina is “damaged”, run this once in Terminal:",
+  },
+  {
+    platform: "Windows",
+    steps: [
+      "Run the installer.",
+      "If SmartScreen shows “Windows protected your PC”, click More info.",
+      "Click Run anyway. Lumina is added to your Start Menu and Desktop.",
+    ],
+    note: null,
+    command: null,
+    commandLabel: null,
+  },
 ];
 
 function getTimeTheme(): ThemeValue {
@@ -129,8 +181,9 @@ export function LandingPage({ macUrl, winUrl }: LandingPageProps) {
             className="mx-auto mt-8 max-w-3xl text-xl leading-9"
             style={{ color: "var(--lumina-ink-soft)" }}
           >
-            A lightweight visual editor for Markdown and TXT files built for
-            simplicity and performance so you can focus on the writing itself.
+            A lightweight visual editor for Markdown and text, built for
+            simplicity and performance. It opens your JSON, XML, CSV and log
+            files beautifully too.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
             <a
@@ -160,6 +213,21 @@ export function LandingPage({ macUrl, winUrl }: LandingPageProps) {
               Download for Windows
             </a>
           </div>
+          <p
+            className="mt-5 text-sm"
+            style={{ color: "var(--lumina-ink-faint)" }}
+          >
+            Free and open source. Lumina isn&apos;t code-signed yet, so the
+            first launch takes{" "}
+            <a
+              href="#first-launch"
+              className="underline underline-offset-2 transition-opacity hover:opacity-70"
+              style={{ color: "var(--lumina-ink-soft)" }}
+            >
+              one extra step
+            </a>
+            .
+          </p>
         </div>
 
         <div className="relative mt-16 pt-4 md:mt-24 md:pt-8">
@@ -210,7 +278,7 @@ export function LandingPage({ macUrl, winUrl }: LandingPageProps) {
         <div className="mt-10 grid gap-5 md:mt-14 md:grid-cols-2">
           {FEATURES.map((feature, index) => (
             <article
-              key={feature}
+              key={feature.title}
               className="border-t pt-6"
               style={{ borderColor: "var(--lumina-border)" }}
             >
@@ -224,18 +292,13 @@ export function LandingPage({ macUrl, winUrl }: LandingPageProps) {
                 className="mt-2 text-2xl font-semibold tracking-[-0.02em]"
                 style={{ color: "var(--lumina-ink)" }}
               >
-                {index === 0 && "Markdown, invisibly"}
-                {index === 1 && "Plain & portable"}
-                {index === 2 && "Calm, by design"}
-                {index === 3 && "Lightweight & fast"}
-                {index === 4 && "Light & dark"}
-                {index === 5 && "macOS & Windows"}
+                {feature.title}
               </p>
               <p
                 className="mt-2 text-lg leading-8"
                 style={{ color: "var(--lumina-ink-soft)" }}
               >
-                {feature}
+                {feature.body}
               </p>
             </article>
           ))}
@@ -267,6 +330,12 @@ export function LandingPage({ macUrl, winUrl }: LandingPageProps) {
               Free, open source, and built to disappear. You&apos;ll be writing
               in 30 seconds.
             </p>
+            <a
+              href="#first-launch"
+              className="mt-3 inline-block text-sm text-white/60 underline underline-offset-2 transition-opacity hover:opacity-80"
+            >
+              First launch on macOS or Windows: what to expect
+            </a>
           </div>
           <div className="flex flex-wrap gap-3">
             <a
@@ -285,6 +354,78 @@ export function LandingPage({ macUrl, winUrl }: LandingPageProps) {
         </div>
       </section>
 
+      <section id="first-launch" className="scroll-mt-8 px-1 md:px-2">
+        <h2
+          className="text-2xl font-semibold tracking-[-0.02em] md:text-3xl"
+          style={{ color: "var(--lumina-ink)" }}
+        >
+          Opening Lumina for the first time
+        </h2>
+        <p
+          className="mt-3 max-w-3xl text-lg leading-8"
+          style={{ color: "var(--lumina-ink-soft)" }}
+        >
+          Lumina is free and open source, and isn&apos;t signed with a paid
+          Apple or Microsoft certificate yet. Your computer will warn you the
+          first time you open it. That is expected, and you only do this once.
+        </p>
+        <div className="mt-8 grid gap-5 md:grid-cols-2">
+          {FIRST_LAUNCH.map((item) => (
+            <article
+              key={item.platform}
+              className="rounded-2xl border p-6"
+              style={{
+                borderColor: "var(--lumina-border)",
+                background: "var(--lumina-chrome)",
+              }}
+            >
+              <h3
+                className="text-xl font-semibold tracking-[-0.02em]"
+                style={{ color: "var(--lumina-ink)" }}
+              >
+                {item.platform}
+              </h3>
+              <ol
+                className="mt-4 list-decimal space-y-2 pl-5 text-base leading-7"
+                style={{ color: "var(--lumina-ink-soft)" }}
+              >
+                {item.steps.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ol>
+              {item.note && (
+                <p
+                  className="mt-4 text-sm leading-6"
+                  style={{ color: "var(--lumina-ink-faint)" }}
+                >
+                  {item.note}
+                </p>
+              )}
+              {item.command && (
+                <>
+                  <p
+                    className="mt-4 text-sm leading-6"
+                    style={{ color: "var(--lumina-ink-soft)" }}
+                  >
+                    {item.commandLabel}
+                  </p>
+                  <pre
+                    className="mt-2 overflow-x-auto rounded-lg border px-3 py-2 text-xs"
+                    style={{
+                      borderColor: "var(--lumina-border)",
+                      background: "var(--lumina-bg)",
+                      color: "var(--lumina-ink)",
+                    }}
+                  >
+                    <code>{item.command}</code>
+                  </pre>
+                </>
+              )}
+            </article>
+          ))}
+        </div>
+      </section>
+
       <footer
         className="flex flex-col items-start justify-between gap-4 border-t py-8 text-sm md:flex-row md:items-center"
         style={{
@@ -293,8 +434,8 @@ export function LandingPage({ macUrl, winUrl }: LandingPageProps) {
         }}
       >
         <p>
-          Lumina is built for distraction-free writing and modern Markdown
-          workflows.
+          Lumina is built for distraction-free writing, and for every plain
+          text file you open along the way.
         </p>
         <p>
           © {currentYear}{" "}
